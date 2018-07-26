@@ -1,0 +1,36 @@
+{
+    "presets": [
+        [
+            "next/babel",
+            {
+                "styled-jsx": { "optimizeForSpeed": false }
+            }
+        ]
+    ],
+    "plugins": [
+        "transform-decorators-legacy",
+        [
+            "module-alias",
+            [
+                { "expose": "@", "src": "./decorator" },
+                { "expose": "c", "src": "./components" },
+                { "expose": "components", "src": "./components" },
+                { "expose": "const", "src": "./common/const" },
+                { "expose": "utils", "src": "./common/utils" },
+                { "expose": "api", "src": "./common/api" },
+                { "expose": "ds", "src": "./common/ds" },
+                { "expose": "styles", "src": "./common/styles" },
+                { "expose": "stores", "src": "./stores" },
+                { "expose": "src", "src": "./src" },
+                { "expose": "svg", "src": "./static/svg" }
+            ]
+        ],
+        [
+            "import",
+            [
+                { "libraryName": "antd-mobile", "style": false },
+                { "libraryName": "./components", "style": false }
+            ]
+        ]
+    ]
+}

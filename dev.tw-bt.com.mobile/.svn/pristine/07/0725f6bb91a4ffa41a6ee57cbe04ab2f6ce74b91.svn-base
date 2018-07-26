@@ -1,0 +1,694 @@
+/*
+* @Author: admin
+* @Date:   2017-10-31 11:28:41
+* @Last Modified by:   admin
+* @Last Modified time: 2017-12-25 17:36:41
+*/
+
+* {
+    padding: 0;
+    margin: 0;
+    outline: 0;
+    box-sizing: border-box;
+    -webkit-overflow-scrolling: touch;
+    -webkit-font-smoothing: antialiased;
+}
+html,
+body,
+font,
+input,
+select,
+button,
+p,
+textarea {
+    font-family: "lucida grande", "lucida sans unicode", lucida, "Helvetica Neue", helvetica, "Hiragino Sans GB", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif !important;
+    font-size: .32rem;
+}
+div,
+p,
+span,
+a,
+button,
+input,
+textarea,
+img,
+i,
+ul,
+li,
+form,
+label {
+    /* 在X5新内核Blink中，在排版页面的时候，会主动对字体进行放大，会检测页面中的主字体，
+               当某一块字体在我们的判断规则中，认为字号较小，并且是页面中的主要字体，并且是页面中的主要字体，
+               就会采取主动放大的操作。然而这不是我们想要的，可以采取给最大高度解决。 */
+    max-height: 10000000px;
+}
+html,
+body {
+    width: 100%;
+}
+body {
+    color: #333;
+    overflow-x: hidden;
+    background: #f2f2f2;
+    -webkit-touch-callout: none;
+    -webkit-text-size-adjust: none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    -webkit-user-select: none;
+}
+a {
+    color: inherit;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight: 400;
+}
+
+/*==================== antd global reset ====================*/
+//170527 Toast偏上一点
+.am-toast:not(.am-toast-nomask) .am-toast-notice {
+    margin-top: -2.2rem;
+}
+.am-toast:not(.am-toast-nomask) .am-toast-notice .am-toast-text {
+    padding: .4rem .64rem;
+    background-color: rgba(58, 58, 58, .8);
+}
+
+//170718 Toast无遮罩轻提示
+.am-toast.am-toast-nomask {
+    position: fixed;
+    top: 86%;
+}
+.am-toast.am-toast-nomask .am-toast-text {
+    background-color: rgba(58, 58, 58, .8);
+}
+
+//170517
+.am-list-item-active {
+    background-color: #fff !important;
+}
+
+//170513 List的header
+.am-list-header {
+    padding: .22rem .3rem .22rem .2rem;
+    background: #fff;
+}
+
+//List.Item
+.am-list-item {
+    padding-left: .24rem !important;
+}
+.am-list-line {
+    padding-right: .24rem !important;
+}
+.am-list-content {
+    padding-top: .16rem !important;
+    padding-bottom: .16rem !important;
+}
+
+//170527 Tabs
+.am-tabs .am-tabs-tab {
+    font-size: .32rem !important;
+    color: #333 !important;
+}
+.am-tabs .am-tabs-content {
+    min-height: 60vh;
+}
+
+//170711 Tabs 多个左右遮罩
+.am-tabs-bar .am-tabs-prevpage:before,
+.am-tabs-bar .am-tabs-nextpage:after {
+    content: initial !important;
+}
+
+//170830 Tabs + List
+.am-tabs-content .am-list-view-scrollview .am-list-body {
+    border-top: 0;
+}
+
+//170628 ActionSheet
+.am-action-sheet {
+    padding: .16rem;
+    background-color: transparent;
+}
+.am-action-sheet-button-list-item {
+    background-color: #fff;
+}
+.am-action-sheet-button-list-item:first-child {
+    border-top-left-radius: .08rem;
+    border-top-right-radius: .08rem;
+}
+.am-action-sheet-button-list-item:nth-last-child(2) {
+    border-bottom-left-radius: .08rem;
+    border-bottom-right-radius: .08rem;
+}
+.am-action-sheet-button-list-item:last-child {
+    border-radius: .08rem;
+}
+.am-action-sheet-cancel-button-mask {
+    display: none;
+}
+
+//170709 ShareActionSheet
+.am-action-sheet.am-action-sheet-share {
+    padding: .16rem;
+    background-color: transparent;
+}
+.am-action-sheet.am-action-sheet-share .am-action-sheet-message {
+    margin: 0;
+    padding: .32rem;
+    background-color: #f2f2f2;
+    border-top-left-radius: .08rem;
+    border-top-right-radius: .08rem;
+}
+.am-action-sheet.am-action-sheet-share .am-action-sheet-share-list {
+    border-top: 1px solid #ddd;
+    background-color: #f2f2f2;
+    border-bottom-left-radius: .08rem;
+    border-bottom-right-radius: .08rem;
+}
+.am-action-sheet.am-action-sheet-share .am-action-sheet-share-list-item:last-child {
+    opacity: 0;
+    width: .08px;
+    overflow: hidden;
+}
+.am-action-sheet.am-action-sheet-share .am-action-sheet-share-cancel-button {
+    margin-top: .16rem;
+    border-radius: .08rem;
+}
+
+//170711 InputItem 金额键盘动画
+.am-number-keyboard-wrapper {
+    transition-duration: .3s;
+    transition-timing-function: ease-in-out;
+}
+
+//170802 全屏modal
+.am-modal-wrap {
+    z-index: 1002;
+}
+
+//170829 searchBar
+.am-search {
+    background-color: #fff !important;
+}
+.am-search-input {
+    background-color: #f2f2f2 !important;
+}
+.am-search-input-start .am-search-input-synthetic-ph {
+    width: 2.56rem !important;
+    padding-left: .24rem !important;
+}
+.am-search-clear-show {
+    margin-top: .12rem;
+    margin-right: .24rem;
+}
+
+.pull-right {
+    float: right;
+}
+
+.mt-xs {
+    margin-top: .08rem !important;
+}
+.mt-sm {
+    margin-top: .16rem !important;
+}
+.mt-md {
+    margin-top: .32rem !important;
+}
+.mt-lg {
+    margin-top: .48rem !important;
+}
+.mt-d {
+    margin-top: .16rem !important;
+}
+.mb-xs {
+    margin-bottom: .08rem !important;
+}
+.mb-sm {
+    margin-bottom: .16rem !important;
+}
+.mb-md {
+    margin-bottom: .32rem !important;
+}
+.mb-lg {
+    margin-bottom: .48rem !important;
+}
+.mr-xs {
+    margin-right: .08rem !important;
+}
+.mr-sm {
+    margin-right: .16rem !important;
+}
+.ml-xxs {
+    margin-left: .04rem !important;
+}
+.ml-xs {
+    margin-left: .08rem !important;
+}
+.ml-sm {
+    margin-left: .16rem !important;
+}
+.ml-md {
+    margin-left: .32rem !important;
+}
+.ml-lg {
+    margin-left: .48rem !important;
+}
+
+.text-center {
+    text-align: center !important;
+}
+.text-right {
+    text-align: right !important;
+}
+.text-xxs {
+    font-size: 0.2rem !important;
+}
+.text-xs {
+    font-size: 0.24rem !important;
+}
+.text-sm {
+    font-size: 0.28rem !important;
+}
+.text-md {
+    font-size: 0.32rem !important;
+}
+.text-lg {
+    font-size: 0.36rem !important;
+}
+.text-xl {
+    font-size: 0.4rem !important;
+}
+.text-xxl {
+    font-size: 0.44rem !important;
+}
+.text-vl {
+    font-size: 0.48rem !important;
+}
+
+.text-primary {
+    color: #518ef3;
+}
+.text-success {
+    color: #68cfac;
+}
+.text-warning {
+    color: #FFC171;
+}
+.text-danger {
+    color: #F7586A;
+}
+.text-info-danger {
+    color: red;
+}
+.text-main {
+    color: #212C4D;
+}
+.text-title {
+    color: #000;
+}
+.text-desc {
+    color: #333;
+}
+.text-sub {
+    color: #888;
+}
+.text-light {
+    color: #bbb;
+}
+.text-void {
+    color: #fff;
+}
+.text-clamp-1 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    word-wrap: break-word;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+}
+.text-clamp-2 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    word-wrap: break-word;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+//171025
+.t-list-md .am-list-content {
+    padding-top: .24rem !important;
+    padding-bottom: .24rem !important;
+}
+.t-list-lg .am-list-content {
+    padding-top: .36rem !important;
+    padding-bottom: .36rem !important;
+}
+
+//171020
+.t-bg {
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+//171024
+.t-default-bg {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-image: url('../images/components/Global/default.png');
+    background-color: #f3f3f3;
+    background-size: 1.6rem;
+}
+
+//170615 <a>分割
+.t-split {
+    display: inline-block;
+    width: 1px;
+    height: 100%;
+    margin: 0 .08rem;
+    background: #ddd;
+}
+
+//170602 使元素有点击效果
+.t-active {
+    transition: all 0.1s ease-in-out;
+}
+.t-active:active {
+    opacity: 0.68;
+}
+
+//170508 包裹Button的容器
+.t-wrap {
+    padding: 0 .24rem;
+}
+
+//170524 Emoji样式
+.t-emoji {
+    width: .44rem !important;
+    height: .44rem !important;
+    vertical-align: bottom !important;
+}
+
+//170620 小表情样式
+.t-qq {
+    width: .48rem !important;
+    height: .48rem !important;
+    vertical-align: bottom !important;
+}
+
+//170620 大表情样式
+.t-emoji-bbs {
+    min-width: 1rem;
+    min-height: 1rem;
+    margin-top: .08rem;
+    margin-right: .02rem;
+    vertical-align: bottom !important;
+}
+
+//170526 无色按钮
+.t-btn-void {
+    color: #fff !important;
+    border-color: #fff !important;
+}
+.t-btn-void.am-button-active {
+        background-color: rgba(255, 255, 255, 0.16);
+    }
+
+//170527 红色按钮
+.t-btn-danger {
+    color: #fff !important;
+    background-color: #F7586A !important;
+    border-color: #F7586A !important;
+    transition: all 0.3s;
+}
+.t-btn-danger.am-button-active {
+    background-color: #f5273f !important;
+}
+
+//170918 蓝色按钮
+.t-btn-primary {
+    color: #fff !important;
+    background-color: #108ee9 !important;
+    border-color: #108ee9 !important;
+}
+.t-btn-primary.am-button-active {
+        background-color: #1284d6 !important;
+    }
+
+//170531 页面居中
+.t-center {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate3d(-50%, -50%, 0);
+}
+
+//170609 表单项Label必填样式
+.t-required {
+    display: inline-block;
+    position: relative;
+}
+.t-required:after {
+        content: '*';
+        display: inline-block;
+        position: absolute;
+        top: 50%;
+        margin-left: 0.08rem;
+        margin-top: -0.2rem;
+        font-family: SimSun;
+        font-size: 0.24rem;
+        line-height: 0.34rem;
+        color: red;
+    }
+
+//170601 仿表单项的错误图标
+.t-error {
+    height: 0.42rem;
+    width: 0.42rem;
+    margin-left: 0.12rem;
+    background-image: url('../images/components/Global/error.png');
+    background-size: 0.42rem auto;
+}
+
+//170625 模态框的Input样式
+.t-modal-input {
+    width: 98%;
+    padding: .08rem .16rem;
+    margin: 0;
+    font-size: .28rem;
+    border: 1px solid #ddd;
+    border-radius: .08rem;
+}
+
+//170627 去掉首行br，和连续br，使文本美观
+.t-hide-br br:first-child,
+.t-hide-br br + br {
+    display: none;
+}
+
+//170730
+.t-link {
+    color: #518ef3;
+    text-decoration: underline;
+}
+
+//170831
+.t-btn-xs {
+    width: 1.28rem !important;
+    height: .48rem;
+    padding: 0 !important;
+    line-height: .48rem;
+    font-size: .24rem;
+}
+
+//170901
+.t-user-select {
+    -webkit-user-select: text !important;
+}
+
+//170914
+.t-fixed-btn {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-radius: 0;
+}
+
+//170918
+.t-img {
+    display: inline-block;
+    vertical-align: top;
+    outline-width: 0;
+}
+
+//170918
+.t-antd-list-split .am-list-body {
+    background-color: transparent;
+    border-top: none;
+}
+.t-antd-list-split .am-list-body:after {
+    border-bottom: none;
+}
+.t-antd-list-split .am-list-body:first-child {
+    margin-top: .16rem;
+}
+.t-antd-list-split .am-list-item {
+    margin-top: .16rem;
+    border-top: 1px solid #e9e9e9;
+    border-bottom: 1px solid #e9e9e9 !important;
+}
+.t-antd-list-split .am-list-item:first-child {
+    margin-top: 0;
+}
+.t-antd-list-split .am-list-body div:not(:last-child) .am-list-line:after {
+    content: initial;
+    border-bottom: none;
+}
+
+//170825
+//舞狮
+.t-bg-wushi {
+    background: url('../images/components/Global/wushi/left.png') bottom left no-repeat,
+        url('../images/components/Global/wushi/right.png') top right no-repeat;
+    background-size: 1.25rem 2.28rem, 1.81rem 1.37rem;
+}
+//绿花
+.t-bg-lvhua {
+    background: url('../images/components/Global/lvhua/left.png') bottom left no-repeat,
+        url('../images/components/Global/lvhua/right.png') top right no-repeat;
+    background-size: 1.98rem 1.88rem, 3.05rem 1.53rem;
+}
+//灯笼
+.t-bg-denglong {
+    background: url('../images/components/Global/denglong/top.png') top center no-repeat;
+    background-size: 100%;
+}
+//水滴
+.t-bg-shuidi {
+    background: url('../images/components/Global/shuidi/top.png') top center no-repeat;
+    background-size: 100%;
+}
+//信使
+.t-bg-xinshi {
+    background: url('../images/components/Global/xinshi/top.png') top center no-repeat;
+    background-size: 100%;
+}
+//墨竹
+.t-bg-mozhu {
+    background: url('../images/components/Global/mozhu/left_top.png') top left no-repeat,
+        url('../images/components/Global/mozhu/left_bottom.png') bottom left no-repeat,
+        url('../images/components/Global/mozhu/right.png') top right no-repeat;
+    background-size: 1.25rem 1.88rem, 4.19rem 6.48rem, 2.43rem 1.64rem;
+}
+//落花
+.t-bg-luohua {
+    background: url('../images/components/Global/luohua/left.png') bottom left no-repeat,
+        url('../images/components/Global/luohua/right.png') top right no-repeat;
+    background-size: 2.81rem 3.54rem, 2.53rem 3.50rem;
+}
+//格子
+.t-bg-gezi {
+    background: url('../images/components/Global/gezi/top.png') top center no-repeat;
+    background-size: 100%;
+}
+//藤蔓
+.t-bg-tengwan {
+    background: url('../images/components/Global/tengwan/top.png') top center no-repeat;
+    background-size: 100%;
+}
+//水墨山水
+.t-bg-shuimoshanshui {
+    background: url('../images/components/Global/shuimoshanshui/top.png') top center no-repeat;
+    background-size: 100%;
+}
+//桃花夭夭
+.t-bg-taohuayaoyao {
+    background: url('../images/components/Global/taohuayaoyao/left.png') bottom left no-repeat,
+        url('../images/components/Global/taohuayaoyao/right.png') top right no-repeat;
+    background-size: 2.24rem 2.71rem, 2.73rem 4.31rem;
+}
+//落樱
+.t-bg-luoying {
+    background: url('../images/components/Global/luoying/top.png') top center no-repeat;
+    background-size: 100%;
+}
+//桥
+.t-bg-qiao {
+    background: url('../images/components/Global/qiao/top.png') center 0.16rem no-repeat;
+    background-size: 100%;
+}
+//柳
+.t-bg-liu {
+    background: url('../images/components/Global/liu/left.png') bottom left no-repeat,
+        url('../images/components/Global/liu/right.png') top right no-repeat;
+    background-size: 2.12rem 1.36rem, 2.58rem 4.21rem;
+}
+
+//落花
+.t-part-luohua {
+    background: url('../images/components/Global/part/luohua.png') top right no-repeat;
+    background-size: 2.17rem 1.10rem;
+}
+//年味
+.t-part-nianwei {
+    background: url('../images/components/Global/part/nianwei.png') top right no-repeat;
+    background-size: 1.36rem 1.29rem;
+}
+//秋收
+.t-part-qiushou {
+    background: url('../images/components/Global/part/qiushou.png') top right no-repeat;
+    background-size: 2.09rem .95rem;
+}
+//舞狮
+.t-part-wushi {
+    background: url('../images/components/Global/part/wushi.png') top right no-repeat;
+    background-size: 1.37rem 1.29rem;
+}
+//夏荷
+.t-part-xiahe {
+    background: url('../images/components/Global/part/xiahe.png') top right no-repeat;
+    background-size: 2.09rem .95rem;
+}
+//鹤鸣
+.t-part-heming {
+    background: url('../images/components/Global/part/heming.png') top right no-repeat;
+    background-size: 2.53rem 1.26rem;
+}
+//戏水
+.t-part-xishui {
+    background: url('../images/components/Global/part/xishui.png') top right no-repeat;
+    background-size: 1.59rem 1.26rem;
+}
+//雪飘
+.t-part-xueren {
+    background: url('../images/components/Global/part/xueren.png') top right no-repeat;
+    background-size: 1.30rem 1.26rem;
+}
+//灵动
+.t-part-lingdong {
+    background: url('../images/components/Global/part/lingdong.png') top right no-repeat;
+    background-size: 1.55rem 1.26rem;
+}
+//元宵
+.t-part-yuanxiao {
+    background: url('../images/components/Global/part/yuanxiao.png') right .10rem no-repeat;
+    background-size: 1.49rem 1.28rem;
+}
+//月圆
+.t-part-yueyuan {
+    background: url('../images/components/Global/part/yueyuan.png') top right no-repeat;
+    background-size: 2.26rem 1.04rem;
+}
+//我爱祖国
+.t-part-woaizuguo {
+    background: url('../images/components/Global/part/woaizuguo.png') right .20rem no-repeat;
+    background-size: 2.27rem 1.17rem;
+}

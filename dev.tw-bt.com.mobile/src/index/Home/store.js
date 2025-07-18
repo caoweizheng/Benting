@@ -14,6 +14,9 @@ import common from 'stores/common';
 import Api from 'api';
 import Const from 'const';
 import G from 'stores/g';
+import Utils from 'utils';
+import { preloadHomeImages } from './_ImagePreloader';
+import networkOptimizer from './_NetworkOptimizer';
 
 const subDataLimit = 5;
 
@@ -23,6 +26,34 @@ export default class Store extends common {
         state: {
             selectedIndex: '36',
             goods: goodsDS,
+            // 加载状态管理
+            isInitialLoading: true,
+            loadingStates: {
+                carousel: false,
+                lottery: false,
+                event: false,
+                article: false,
+                video: false,
+                notice: false
+            },
+            // 错误状态管理
+            errors: {
+                carousel: null,
+                lottery: null,
+                event: null,
+                article: null,
+                video: null,
+                notice: null
+            },
+            // 重试计数
+            retryCount: {
+                carousel: 0,
+                lottery: 0,
+                event: 0,
+                article: 0,
+                video: 0,
+                notice: 0
+            }
         },
 
         //优惠券信息
@@ -43,35 +74,191 @@ export default class Store extends common {
 
     initFetch = {
         one: [
-            'fetchLotteryInfo',
-            'fetchHomeCarousel',
-            'fetchEventInfo',
-            'fetchArticleTopList',
-            'fetchTopVideoList',
-            'checkRecentNotice'
+            'initializeHomePage'
         ]
+    };
+
+    // 最大重试次数
+    maxRetries = 3;
+
+    /*==================== 初始化方法 ====================*/
+    // 初始化首页数据，优化加载策略
+    initializeHomePage = async () => {
+        this.setState({
+            isInitialLoading: true
+        });
+
+        try {
+            // 获取网络优化策略
+            const networkStrategy = networkOptimizer.getOptimizationStrategy();
+            const concurrentLimit = networkOptimizer.getConcurrentRequestLimit();
+
+            // 根据网络状况调整加载策略
+            if (networkStrategy.imageQuality === 'none') {
+                // 离线状态，只加载基本数据
+                await this.fetchEventInfo();
+            } else if (concurrentLimit <= 1) {
+                // 网络较差，串行加载
+                await this.fetchHomeCarousel();
+                await this.fetchEventInfo();
+
+                // 延迟加载次要内容
+                setTimeout(() => {
+                    this.fetchLotteryInfo();
+                    this.fetchArticleTopList();
+                    this.fetchTopVideoList();
+                    this.checkRecentNotice();
+                }, 2000);
+            } else {
+                // 网络良好，并行加载
+                const criticalPromises = [
+                    this.fetchHomeCarousel(),
+                    this.fetchEventInfo()
+                ];
+
+                const secondaryPromises = [
+                    this.fetchLotteryInfo(),
+                    this.fetchArticleTopList(),
+                    this.fetchTopVideoList(),
+                    this.checkRecentNotice()
+                ];
+
+                // 并行加载关键内容
+                await Promise.allSettled(criticalPromises);
+
+                // 根据网络状况决定是否立即加载次要内容
+                if (concurrentLimit >= 3) {
+                    await Promise.allSettled(secondaryPromises);
+                } else {
+                    // 延迟加载次要内容
+                    setTimeout(() => {
+                        Promise.allSettled(secondaryPromises);
+                    }, 1000);
+                }
+
+                // 预加载图片（仅在网络良好时）
+                if (networkOptimizer.shouldPreload()) {
+                    this.preloadImages();
+                }
+            }
+
+        } catch (error) {
+            console.error('首页初始化失败:', error);
+        } finally {
+            this.setState({
+                isInitialLoading: false
+            });
+        }
+    };
+
+    // 预加载图片
+    preloadImages = () => {
+        try {
+            const homeData = {
+                homeCarousel: this.getState('homeCarousel'),
+                eventInfo: this.getState('eventInfo'),
+                topVideoList: this.getState('topVideoList')
+            };
+
+            preloadHomeImages(homeData, Utils).catch(error => {
+                console.warn('图片预加载失败:', error);
+            });
+        } catch (error) {
+            console.warn('图片预加载初始化失败:', error);
+        }
+    };
+
+    /*==================== 工具方法 ====================*/
+    // 设置加载状态
+    setLoadingState = (key, loading) => {
+        this.setState({
+            loadingStates: {
+                ...this.getState('loadingStates'),
+                [key]: loading
+            }
+        });
+    };
+
+    // 设置错误状态
+    setErrorState = (key, error) => {
+        this.setState({
+            errors: {
+                ...this.getState('errors'),
+                [key]: error
+            }
+        });
+    };
+
+    // 增强的fetch方法，带重试和错误处理
+    enhancedFetch = async (key, api, stateKey, query, config = {}) => {
+        const { maxRetries = this.maxRetries } = config;
+        const retryCount = this.getState('retryCount')[key] || 0;
+
+        this.setLoadingState(key, true);
+        this.setErrorState(key, null);
+
+        try {
+            const result = await this.fetchThenSetState(api, stateKey, query, {
+                show: false, // 不显示默认loading
+                ...config
+            });
+
+            // 重置重试计数
+            this.setState({
+                retryCount: {
+                    ...this.getState('retryCount'),
+                    [key]: 0
+                }
+            });
+
+            return result;
+        } catch (error) {
+            this.setErrorState(key, error);
+
+            // 如果还有重试机会，自动重试
+            if (retryCount < maxRetries) {
+                this.setState({
+                    retryCount: {
+                        ...this.getState('retryCount'),
+                        [key]: retryCount + 1
+                    }
+                });
+
+                // 延迟重试
+                setTimeout(() => {
+                    this.enhancedFetch(key, api, stateKey, query, config);
+                }, 1000 * (retryCount + 1)); // 递增延迟
+            }
+
+            throw error;
+        } finally {
+            this.setLoadingState(key, false);
+        }
     };
 
     /*==================== DS ====================*/
     //优惠券信息
     fetchLotteryInfo = () => {
-        return this.fetchThenSetState('get_event_processing', 'lotteryInfo');
+        return this.enhancedFetch('lottery', 'get_event_processing', 'lotteryInfo');
     };
 
     //活动信息
     fetchEventInfo = () => {
-        return this.fetchThenSetState('get_event_home-info', 'eventInfo');
+        return this.enhancedFetch('event', 'get_event_home-info', 'eventInfo');
     };
 
     //首页轮播图
     fetchHomeCarousel = () => {
-        return this.fetchThenSetState('get_carousel_list', 'homeCarousel', {
+        return this.enhancedFetch('carousel', 'get_carousel_list', 'homeCarousel', {
             imgType: 41
         });
     };
 
     //资讯置顶列表
     fetchArticleTopList = refresh => {
+        this.setLoadingState('article', true);
+        this.setErrorState('article', null);
+
         return this.fetchListThenSetState(
             'get_article_list',
             'articleTopList',
@@ -81,12 +268,19 @@ export default class Store extends common {
                 }
             },
             refresh
-        );
+        ).then(result => {
+            this.setLoadingState('article', false);
+            return result;
+        }).catch(error => {
+            this.setErrorState('article', error);
+            this.setLoadingState('article', false);
+            throw error;
+        });
     };
 
     //置顶到视频列表
     fetchTopVideoList = () => {
-        return this.fetchThenSetState('get_video_list-list', 'topVideoList', {
+        return this.enhancedFetch('video', 'get_video_list-list', 'topVideoList', {
             _: {
                 limit: 6,
                 search: {
@@ -100,6 +294,54 @@ export default class Store extends common {
     /*fetchSpecialGoods = () => {
         return this.fetchThenSetState('get_shop_special-goods', 'specialGoods');
     };*/
+
+    /*==================== 用户操作方法 ====================*/
+    // 手动重试特定模块
+    retryModule = (moduleKey) => {
+        const moduleMap = {
+            carousel: this.fetchHomeCarousel,
+            lottery: this.fetchLotteryInfo,
+            event: this.fetchEventInfo,
+            article: this.fetchArticleTopList,
+            video: this.fetchTopVideoList,
+            notice: this.checkRecentNotice
+        };
+
+        const fetchMethod = moduleMap[moduleKey];
+        if (fetchMethod) {
+            // 重置错误状态
+            this.setErrorState(moduleKey, null);
+            return fetchMethod();
+        }
+    };
+
+    // 刷新所有数据
+    refreshAllData = () => {
+        return this.initializeHomePage();
+    };
+
+    /*==================== 性能监控 ====================*/
+    // 记录加载性能
+    recordLoadingPerformance = () => {
+        if (typeof window !== 'undefined' && window.performance) {
+            const navigation = window.performance.getEntriesByType('navigation')[0];
+            const loadTime = navigation.loadEventEnd - navigation.loadEventStart;
+
+            // 可以发送到监控系统
+            console.log('首页加载时间:', loadTime + 'ms');
+
+            // 记录关键指标
+            const metrics = {
+                loadTime,
+                domContentLoaded: navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart,
+                firstPaint: window.performance.getEntriesByName('first-paint')[0]?.startTime || 0,
+                firstContentfulPaint: window.performance.getEntriesByName('first-contentful-paint')[0]?.startTime || 0
+            };
+
+            return metrics;
+        }
+        return null;
+    };
 
     //[鱼获有礼]分类商品列表
     /*fetchSubData = async id => {
